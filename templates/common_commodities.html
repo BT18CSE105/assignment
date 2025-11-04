@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <h1 class="page-title text-center mb-4">{{ title }}</h1>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <strong>Top 10 Transactions (Imports & Exports)</strong>
+        </div>
+        <div class="card-body">
+          {% if table %}
+            {{ table|safe }}
+          {% else %}
+            <p class="text-muted text-center">No transaction data available.</p>
+          {% endif %}
+
+          {% if image %}
+            <!-- <div class="text-center mt-4">
+              <img src="{{ url_for('static', filename=image) }}" class="img-fluid rounded shadow-sm" alt="Export Chart">
+            </div>
+          {% endif %}
+
+          {% if image2 %}
+            <div class="text-center mt-4">
+              <img src="{{ url_for('static', filename=image2) }}" class="img-fluid rounded shadow-sm" alt="Import Chart">
+            </div>
+          {% endif %} -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

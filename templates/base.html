@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title or "India Trade Analysis" }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body { padding: 16px; }
+      .page-title { margin-bottom: 18px; }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-dark mb-4">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('home') }}">India Trade Analysis</a>
+        <div class="d-flex">
+          <a class="nav-link text-light" href="{{ url_for('top_countries') }}">(a)</a>
+          <a class="nav-link text-light" href="{{ url_for('top_commodities') }}">(b)</a>
+          <a class="nav-link text-light" href="{{ url_for('trade_summary') }}">(c)</a>
+          <a class="nav-link text-light" href="{{ url_for('export_over_10000') }}">(d)</a>
+          <a class="nav-link text-light" href="{{ url_for('saved_table') }}">(e)</a>
+          <a class="nav-link text-light" href="{{ url_for('top_transactions') }}">(f)</a>
+          <a class="nav-link text-light" href="{{ url_for('common_commodities') }}">(g)</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>
