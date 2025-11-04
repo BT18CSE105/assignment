@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, Response
+from flask import Flask, render_template, jsonify, Response, send_file
 from models import db, ImportRecord, ExportRecord
 import pandas as pd
 import matplotlib
@@ -7,26 +7,34 @@ import matplotlib.pyplot as plt
 from sqlalchemy import create_engine, inspect
 import numpy as np
 import os
+import io
+import base64
 
 app = Flask(__name__)
-os.makedirs(app.instance_path, exist_ok=True)
-db_path = os.path.join(app.instance_path, 'trade_data.db')
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
+# Use in-memory SQLite database for Vercel
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 db.init_app(app)
 
-engine = create_engine(f"sqlite:///{db_path}")
+engine = create_engine('sqlite:///:memory:')
 
-try:
-    from database_setup import populate_db
+with app.app_context():
+    db.create_all()
     try:
-        populate_db(app)
-    except FileNotFoundError as e:
-        print(f"populate_db skipped: {e}")
+        from database_setup import populate_db
+        try:
+            populate_db(app)
+        except FileNotFoundError as e:
+            print(f"populate_db skipped: {e}")
+        except Exception as e:
+            print(f"populate_db error: {e}")
     except Exception as e:
-        print(f"populate_db error: {e}")
-except Exception:
-    pass
-os.makedirs('static/charts', exist_ok=True)
+        print(f"Error during database setup: {e}")
+
+def save_plt_to_base64():
+    img = io.BytesIO()
+    plt.savefig(img, format='png', bbox_inches='tight')
+    img.seek(0)
+    return base64.b64encode(img.getvalue()).decode()
 
 
 @app.route('/')
@@ -46,18 +54,20 @@ def top_countries():
     top_imports_df = top_imports.reset_index().rename(columns={'value': 'Imports', 'country': 'Country'})
     top_exports_df = top_exports.reset_index().rename(columns={'value': 'Exports', 'country': 'Country'})
 
+    # Generate import chart
     plt.figure(figsize=(8, 4))
     top_imports.plot(kind='bar', color='tab:red')
     plt.title('Top 5 Import Destinations (2011–12)')
     plt.tight_layout()
-    plt.savefig('static/charts/top_imports.png')
+    imports_img = save_plt_to_base64()
     plt.close()
 
+    # Generate export chart
     plt.figure(figsize=(8, 4))
     top_exports.plot(kind='bar', color='tab:green')
     plt.title('Top 5 Export Destinations (2011–12)')
     plt.tight_layout()
-    plt.savefig('static/charts/top_exports.png')
+    exports_img = save_plt_to_base64()
     plt.close()
 
     return render_template(
@@ -65,8 +75,8 @@ def top_countries():
         title="(a) Top 5 Import & Export Destinations",
         table=top_imports_df.to_html(classes='table table-striped', index=False, justify='center'),
         table2=top_exports_df.to_html(classes='table table-striped', index=False, justify='center'),
-        image='charts/top_imports.png',
-        image2='charts/top_exports.png'
+        image=f"data:image/png;base64,{imports_img}",
+        image2=f"data:image/png;base64,{exports_img}"
     )
 
 

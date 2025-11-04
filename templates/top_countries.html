@@ -7,7 +7,7 @@
       <div class="card mb-3">
         <div class="card-body">
           {% if table %}{{ table|safe }}{% endif %}
-          {% if image %}<img src="{{ url_for('static', filename=image) }}" class="img-fluid mt-3" alt="chart">{% endif %}
+          {% if image %}<img src="{{ image }}" class="img-fluid mt-3" alt="chart">{% endif %}
         </div>
       </div>
     </div>
@@ -15,7 +15,7 @@
       <div class="card mb-3">
         <div class="card-body">
           {% if table2 %}{{ table2|safe }}{% endif %}
-          {% if image2 %}<img src="{{ url_for('static', filename=image2) }}" class="img-fluid mt-3" alt="chart2">{% endif %}
+          {% if image2 %}<img src="{{ image2 }}" class="img-fluid mt-3" alt="chart2">{% endif %}
         </div>
       </div>
     </div>
